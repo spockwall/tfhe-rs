@@ -65,12 +65,15 @@ Note: aarch64-based machines are not yet supported for Windows as it's currently
 Here is a full example:
 
 ``` rust
+use std::time::{Duration, Instant};
 use tfhe::prelude::*;
 use tfhe::{generate_keys, set_server_key, ConfigBuilder, FheUint32, FheUint8};
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Start timer
+    let start = Instant::now();
+
     // Basic configuration to use homomorphic integers
-    let config = ConfigBuilder::default().build();
+    let config: tfhe::Config = From::from(ConfigBuilder::all_enabled());
 
     // Key generation
     let (client_key, server_keys) = generate_keys(config);
@@ -110,6 +113,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let clear_res: u8 = encrypted_res.decrypt(&client_key);
     assert_eq!(clear_res, 1_u8);
 
+    // Stop timer
+    let duration: Duration = start.elapsed();
+
+    // Print time elapsed
+    println!("Time elapsed: {:?}", duration);
     Ok(())
 }
 ```
